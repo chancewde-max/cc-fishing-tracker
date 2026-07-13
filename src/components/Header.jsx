@@ -1,11 +1,14 @@
 import { NavLink } from 'react-router-dom';
+import { useAuth } from '../lib/useAuth.js';
 import styles from './Header.module.css';
 
 export default function Header() {
+  const { user, signOut } = useAuth();
+
   return (
     <header className={styles.header}>
       <div className={styles.inner}>
-        <NavLink to="/" className={styles.brand} aria-label="Gulf Bite home">
+        <NavLink to="/tracker" className={styles.brand} aria-label="Gulf Bite home">
           <span className={styles.logoMark} aria-hidden="true">
             🌊
           </span>
@@ -16,8 +19,7 @@ export default function Header() {
 
         <nav className={styles.nav} aria-label="Primary">
           <NavLink
-            to="/"
-            end
+            to="/tracker"
             className={({ isActive }) =>
               isActive ? `${styles.link} ${styles.active}` : styles.link
             }
@@ -40,6 +42,20 @@ export default function Header() {
           >
             Blog
           </NavLink>
+          {user ? (
+            <button type="button" className={styles.link} onClick={signOut}>
+              Log Out
+            </button>
+          ) : (
+            <NavLink
+              to="/login"
+              className={({ isActive }) =>
+                isActive ? `${styles.link} ${styles.active}` : styles.link
+              }
+            >
+              Log In
+            </NavLink>
+          )}
         </nav>
       </div>
     </header>

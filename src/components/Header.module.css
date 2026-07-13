@@ -58,6 +58,8 @@
   color: var(--text-muted);
   padding: 0.45rem 0.85rem;
   border-radius: 999px;
+  border: none;
+  background: none;
   transition: background 0.15s ease, color 0.15s ease;
 }
 

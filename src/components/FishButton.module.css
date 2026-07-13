@@ -1,0 +1,46 @@
+.wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 220px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+  transition: transform 0.15s ease;
+  filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.45));
+}
+
+.wrap:hover,
+.wrap:focus-visible {
+  transform: translateY(-3px) scale(1.03);
+}
+
+.wrap:active {
+  transform: translateY(0) scale(0.99);
+}
+
+.svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.label {
+  position: absolute;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: 0.03em;
+  color: #1c2418;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.amber .label {
+  color: #3a2b12;
+}
+
+.teal .label {
+  color: #103042;
+}

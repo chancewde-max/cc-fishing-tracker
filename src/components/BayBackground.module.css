@@ -1,0 +1,106 @@
+.scene {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Fixed to the viewport (not the scrollable page), so the scene stays a
+   stable sky-to-water backdrop no matter how tall the page content is. */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.sky {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    #ffd8a8 0%,
+    #ffb877 18%,
+    #6fb3d2 46%,
+    #1c7fa3 62%,
+    #0d4f6b 100%
+  );
+}
+
+/* Two tiled wave layers scrolling at different speeds for a parallax feel. */
+.waterFar,
+.waterNear {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 42%;
+  background-repeat: repeat-x;
+  background-size: 220px 100%;
+  will-change: background-position;
+}
+
+.waterFar {
+  bottom: 6%;
+  height: 20%;
+  opacity: 0.55;
+  background-image: radial-gradient(ellipse at 50% 120%, rgba(255, 255, 255, 0.35) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(20, 90, 120, 0.5), rgba(10, 60, 85, 0.85));
+  animation: driftFar 60s linear infinite;
+}
+
+.waterNear {
+  background-image: radial-gradient(ellipse at 30% 0%, rgba(255, 255, 255, 0.25) 0%, transparent 55%),
+    linear-gradient(180deg, #0d4f6b, #062d3f);
+  animation: driftNear 34s linear infinite;
+}
+
+@keyframes driftFar {
+  from {
+    background-position-x: 0;
+  }
+  to {
+    background-position-x: -220px;
+  }
+}
+
+@keyframes driftNear {
+  from {
+    background-position-x: 0;
+  }
+  to {
+    background-position-x: 220px;
+  }
+}
+
+.boat {
+  position: absolute;
+  left: -10vw;
+  filter: drop-shadow(0 6px 6px rgba(0, 0, 0, 0.35));
+  animation-name: sail;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  transform: translateX(0) scaleX(-1); /* face right, toward travel direction */
+}
+
+/* translateX must come before scaleX(-1) in the function list: transforms
+   apply right-to-left, so scaleX first would mirror the translate itself
+   and send the boat drifting off in the wrong (negative) direction. */
+@keyframes sail {
+  from {
+    transform: translateX(0) scaleX(-1);
+  }
+  to {
+    transform: translateX(120vw) scaleX(-1);
+  }
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
