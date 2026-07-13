@@ -13,14 +13,6 @@ function GoogleIcon() {
   );
 }
 
-function AppleIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="currentColor">
-      <path d="M16.365 1.43c0 1.14-.428 2.19-1.14 2.988-.83.92-2.146 1.63-3.34 1.53-.145-1.1.42-2.25 1.13-3.02.81-.87 2.21-1.51 3.35-1.5zM20.6 17.02c-.42.97-.62 1.4-1.16 2.26-.75 1.19-1.81 2.67-3.12 2.68-1.17.01-1.47-.76-3.05-.75-1.58.01-1.91.76-3.08.75-1.31-.01-2.31-1.35-3.06-2.54-2.1-3.3-2.32-7.18-1.03-9.24.92-1.47 2.37-2.33 3.73-2.33 1.39 0 2.26.79 3.41.79 1.11 0 1.79-.79 3.41-.79 1.21 0 2.5.66 3.42 1.8-3.01 1.65-2.52 5.94.48 7.37z" />
-    </svg>
-  );
-}
-
 /**
  * Shared shell for the sign-in / sign-up cards: bay background, brand
  * header, glass card with icon fields, primary button, a divider, social
@@ -76,14 +68,6 @@ export default function AuthCard({
               onClick={() => onSocial?.('google')}
             >
               <GoogleIcon />
-            </button>
-            <button
-              type="button"
-              className={styles.socialBtn}
-              aria-label="Continue with Apple"
-              onClick={() => onSocial?.('apple')}
-            >
-              <AppleIcon />
             </button>
           </div>
 
