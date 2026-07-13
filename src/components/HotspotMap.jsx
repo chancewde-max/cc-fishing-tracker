@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, CircleMarker, Popup, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import styles from './HotspotMap.module.css';
 import { useHotspots, DEFAULT_HOTSPOTS, isAuthError } from '../lib/useHotspots';
@@ -47,6 +47,14 @@ function CtrlScrollZoom() {
       map.scrollWheelZoom.disable();
     };
   }, [map]);
+  return null;
+}
+
+// MapContainer doesn't forward an onClick prop to Leaflet's click event
+// (unrecognized props are passed through as Leaflet MapOptions and ignored),
+// so map clicks must be captured via useMapEvents instead.
+function MapClickHandler({ onMapClick }) {
+  useMapEvents({ click: onMapClick });
   return null;
 }
 
@@ -369,10 +377,10 @@ export default function HotspotMap() {
           zoom={ZOOM}
           scrollWheelZoom={false}
           className={styles.map}
-          onClick={handleMapClick}
         >
           <MapCapture onReady={(m) => (mapRef.current = m)} />
           <CtrlScrollZoom />
+          <MapClickHandler onMapClick={handleMapClick} />
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
             url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
