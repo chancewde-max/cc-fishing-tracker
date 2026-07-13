@@ -84,10 +84,24 @@ export async function fetchTidesForStation(station) {
   }
 }
 
-/** Fetch both stations in parallel. */
+/**
+ * Fetch both stations. Goes through the Vercel serverless function
+ * (/api/tides) which proxies NOAA server-side — avoids browser CORS and
+ * any edge-blocking of direct client calls to api.tidesandcurrents.noaa.gov.
+ * Falls back to direct NOAA fetch if the function is unavailable (local dev).
+ */
 export async function fetchTides() {
-  const results = await Promise.all(TIDE_STATIONS.map(fetchTidesForStation));
-  return { stations: results, fetchedAt: new Date().toISOString() };
+  try {
+    const res = await fetch('/api/tides', { headers: { Accept: 'application/json' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (!data.stations) throw new Error('bad shape');
+    return data;
+  } catch (e) {
+    // Local/dev fallback: call NOAA directly (needs CORS; works on some setups)
+    const results = await Promise.all(TIDE_STATIONS.map(fetchTidesForStation));
+    return { stations: results, fetchedAt: new Date().toISOString(), note: 'direct-fallback' };
+  }
 }
 
 /**

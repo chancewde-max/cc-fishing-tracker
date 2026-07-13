@@ -43,7 +43,7 @@ export default function BiteCard({ name, emoji, result }) {
       </div>
 
       <ul className={styles.reasons}>
-        {reasons.map((r, idx) => (
+        {reasons.slice(0, 2).map((r, idx) => (
           <li key={idx}>{r}</li>
         ))}
       </ul>

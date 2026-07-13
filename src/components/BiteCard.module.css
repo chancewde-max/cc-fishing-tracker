@@ -2,8 +2,8 @@
   background: linear-gradient(160deg, var(--bg-panel), var(--bg-panel-2));
   border: 1px solid var(--border-soft);
   border-left: 4px solid var(--border-strong);
-  border-radius: var(--radius);
-  padding: var(--space-md) var(--space-md) var(--space-sm);
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 0.6rem 0.5rem;
   box-shadow: var(--shadow-soft);
   transition: transform 0.15s ease, border-color 0.15s ease;
 }
@@ -32,13 +32,13 @@
 }
 
 .emoji {
-  font-size: 1.4rem;
+  font-size: 1.2rem;
 }
 
 .name {
   flex: 1;
   margin: 0;
-  font-size: 1.2rem;
+  font-size: 1rem;
   letter-spacing: 0.01em;
 }
 
@@ -73,8 +73,8 @@
 
 .gauge {
   display: flex;
-  gap: 6px;
-  margin: 0.7rem 0 0.6rem;
+  gap: 5px;
+  margin: 0.45rem 0 0.4rem;
 }
 
 .pip {
@@ -99,15 +99,15 @@
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.2rem;
 }
 
 .reasons li {
   position: relative;
-  padding-left: 1.2rem;
-  font-size: 0.85rem;
+  padding-left: 1.1rem;
+  font-size: 0.78rem;
   color: var(--text-muted);
-  line-height: 1.35;
+  line-height: 1.3;
 }
 
 .reasons li::before {

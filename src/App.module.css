@@ -1,7 +1,8 @@
 .appShell {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   background:
     radial-gradient(1200px 600px at 80% -10%, rgba(255, 176, 87, 0.08), transparent 60%),
     radial-gradient(900px 500px at 0% 0%, rgba(22, 138, 173, 0.14), transparent 55%),
@@ -11,19 +12,23 @@
 
 .main {
   flex: 1;
+  min-height: 0;
   width: 100%;
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: var(--space-lg) var(--space-md);
+  padding: var(--space-md) var(--space-md);
   box-sizing: border-box;
 }
 
-/* Dashboard + map sit side by side on wide screens, stack on mobile */
+/* Dashboard + map sit side by side on wide screens, stack on mobile.
+   The grid fills the available height under the header so each column can
+   own its own scroll/height instead of pushing the page. */
 .homeGrid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
-  gap: var(--space-lg);
-  align-items: start;
+  gap: var(--space-md);
+  align-items: stretch;
+  height: 100%;
 }
 
 .footer {
@@ -32,10 +37,10 @@
   gap: var(--space-sm);
   justify-content: space-between;
   align-items: center;
-  padding: var(--space-md) var(--space-lg);
+  padding: 0.45rem var(--space-lg);
   border-top: 1px solid var(--border-soft);
   color: var(--text-muted);
-  font-size: 0.8rem;
+  font-size: 0.74rem;
 }
 
 .footerMuted {
@@ -43,8 +48,18 @@
 }
 
 @media (max-width: 960px) {
+  .appShell {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+  .main {
+    min-height: 0;
+  }
   .homeGrid {
     grid-template-columns: 1fr;
+    height: auto;
+    gap: var(--space-md);
   }
 }
 
