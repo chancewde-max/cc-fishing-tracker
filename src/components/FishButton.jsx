@@ -3,9 +3,9 @@ import styles from './FishButton.module.css';
 
 // Spotted-seatrout silhouette used as a call-to-action button on the landing
 // page. Drawn in SVG (no external asset) so it needs no network/image file.
-// Key ID features vs. a generic fish blob: forked tail, two dorsal fins,
-// tapered torpedo body, and dark spots concentrated on the back/tail/dorsal
-// fin rather than scattered evenly.
+// Key ID features vs. a generic fish blob: forked tail, a single dorsal fin
+// (two lobes, one connected silhouette), a slim tapered body, and dark spots
+// concentrated on the back/tail/dorsal fin rather than scattered evenly.
 function FishSvg() {
   return (
     <svg viewBox="0 0 220 100" className={styles.svg} aria-hidden="true">
@@ -20,34 +20,32 @@ function FishSvg() {
 
       {/* forked tail */}
       <path
-        d="M34 50 L4 30 L17 50 L4 70 Z"
+        d="M32 50 L6 33 L17 50 L6 67 Z"
         fill="url(#fishBody)"
         stroke="#6d7a5e"
         strokeWidth="1.5"
       />
 
-      {/* body: tapered torpedo shape, pointed nose at right */}
+      {/* body: slim tapered torpedo shape, pointed nose at right */}
       <path
         d="M32 50
-           C 36 28, 70 14, 115 13
-           C 150 12, 186 22, 213 50
-           C 186 78, 150 88, 115 87
-           C 70 86, 36 72, 32 50 Z"
+           C 36 34, 70 24, 115 23
+           C 150 22, 186 30, 213 50
+           C 186 70, 150 78, 115 77
+           C 70 76, 36 66, 32 50 Z"
         fill="url(#fishBody)"
         stroke="#6d7a5e"
         strokeWidth="1.5"
       />
 
-      {/* first (spiny) dorsal fin */}
+      {/* single dorsal fin, two lobes joined in one silhouette */}
       <path
-        d="M93 16 C 98 3, 110 -2, 120 4 C 112 11, 102 15, 93 16 Z"
-        fill="#8b9976"
-        stroke="#6d7a5e"
-        strokeWidth="1"
-      />
-      {/* second (soft) dorsal fin */}
-      <path
-        d="M121 5 C 130 -4, 146 -3, 156 6 C 146 11, 132 10, 121 5 Z"
+        d="M88 24
+           C 92 8, 102 0, 108 2
+           C 114 4, 118 10, 122 12
+           C 126 8, 134 -2, 142 1
+           C 150 4, 158 12, 162 23
+           C 145 21, 105 21, 88 24 Z"
         fill="#8b9976"
         stroke="#6d7a5e"
         strokeWidth="1"
@@ -55,33 +53,33 @@ function FishSvg() {
 
       {/* pectoral fin */}
       <path
-        d="M148 54 C 156 64, 156 76, 148 84 C 140 75, 139 62, 148 54 Z"
+        d="M147 56 C 154 63, 154 71, 147 78 C 141 71, 140 62, 147 56 Z"
         fill="#e8d590"
         stroke="#b89a5c"
         strokeWidth="1"
       />
       {/* pelvic/anal fin */}
       <path
-        d="M104 85 C 109 92, 118 94, 127 90 C 118 87, 111 86, 104 85 Z"
+        d="M103 76 C 107 82, 115 84, 123 81 C 115 79, 109 78, 103 76 Z"
         fill="#e8d590"
         stroke="#b89a5c"
         strokeWidth="1"
       />
 
-      {/* spots concentrated on the back, trailing onto the tail + dorsal fins */}
+      {/* spots concentrated on the back, trailing onto the tail + dorsal fin */}
       {[
-        [60, 34], [72, 26], [86, 22], [100, 20], [114, 21], [128, 24], [142, 30], [154, 36],
-        [66, 44], [80, 38], [94, 34], [108, 33], [122, 35], [136, 40],
-        [56, 52], [70, 56], [84, 58],
-        [102, 8], [131, 2], [24, 40], [22, 58],
+        [58, 36], [70, 30], [84, 27], [98, 26], [112, 27], [126, 29], [140, 34], [152, 39],
+        [64, 45], [78, 40], [92, 38], [106, 37], [120, 39], [134, 43],
+        [56, 52], [68, 55], [80, 57],
+        [104, 8], [133, 4], [22, 42], [20, 58],
       ].map(([cx, cy], i) => (
-        <circle key={i} cx={cx} cy={cy} r="2.4" fill="#3c4a35" opacity="0.8" />
+        <circle key={i} cx={cx} cy={cy} r="2.2" fill="#3c4a35" opacity="0.8" />
       ))}
 
       {/* eye */}
-      <circle cx="197" cy="42" r="5.5" fill="#d9b65c" />
-      <circle cx="198" cy="42" r="3" fill="#20240f" />
-      <circle cx="199.5" cy="40" r="1.1" fill="#fff" />
+      <circle cx="196" cy="43" r="5" fill="#d9b65c" />
+      <circle cx="197" cy="43" r="2.7" fill="#20240f" />
+      <circle cx="198.5" cy="41" r="1" fill="#fff" />
 
       {/* mouth + protruding lower jaw */}
       <path
