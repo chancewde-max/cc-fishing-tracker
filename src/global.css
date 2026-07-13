@@ -122,10 +122,14 @@ button {
   border: 0;
 }
 
-/* Respect reduced-motion preferences */
+/* Respect reduced-motion preferences. animation-iteration-count is forced to
+   1 as well as duration — otherwise an infinite-loop animation (e.g. the
+   drifting boats) just replays its near-instant duration forever, which
+   reads as rapid flickering instead of "reduced" motion. */
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
   }
 }
