@@ -16,6 +16,14 @@ function fmtTime(iso) {
   return new Date(iso).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 }
 
+// Prefer the first station with usable predictions over always using
+// stations[0] blindly, so a single failed station doesn't degrade the
+// bite score when another station has good data.
+function pickPrimaryStation(stations) {
+  if (!stations || !stations.length) return null;
+  return stations.find((s) => !s.error && s.predictions?.length) ?? stations[0];
+}
+
 function tideStateLabel(state) {
   if (!state || !state.nextType) return '—';
   const label = state.nextType === 'H' ? 'High' : 'Low';
@@ -94,7 +102,7 @@ export default function ConditionsDashboard() {
         ? Number((weather.pressure - weather.pressure6hAgo).toFixed(2))
         : null;
 
-    const primaryPreds = tides?.stations?.[0]?.predictions ?? [];
+    const primaryPreds = pickPrimaryStation(tides?.stations)?.predictions ?? [];
     const tideState = deriveTideState(primaryPreds, new Date());
 
     const waterTemp = weather?.waterTemp ?? null;
@@ -117,7 +125,7 @@ export default function ConditionsDashboard() {
     return { pressureTrend, tideState, bites };
   }, [weather, tides, solunar]);
 
-  const primaryStation = tides?.stations?.[0];
+  const primaryStation = pickPrimaryStation(tides?.stations);
   const nextTide = tideStateLabel(derived.tideState);
 
   return (

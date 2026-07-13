@@ -121,8 +121,7 @@ async function fetchStormGlass(st, key) {
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Content-Type', 'application/json');
-  const key = process.env.STORMGLASS_KEY || 'ac37c5f8-7ed7-11f1-8cc9-0242ac120004-ac37c666-7ed7-11f1-8cc9-0242ac120004';
-
+  const key = process.env.STORMGLASS_KEY;
   const results = await Promise.all(
     STATIONS.map(async (st) => {
       // 1) local harmonic synthesis (free, robust)
