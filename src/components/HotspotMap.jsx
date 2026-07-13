@@ -81,6 +81,37 @@ function MapCapture({ onReady }) {
   return null;
 }
 
+// Scroll-wheel zoom is OFF by default (so the page doesn't hijack scroll).
+// Hold CTRL + scroll to zoom the map (common power-user pattern).
+function CtrlScrollZoom() {
+  const map = useMap();
+  useEffect(() => {
+    const container = map.getContainer();
+    const enable = () => map.scrollWheelZoom.enable();
+    const disable = () => map.scrollWheelZoom.disable();
+    const onKeyDown = (e) => {
+      if (e.key === 'Control') enable();
+    };
+    const onKeyUp = (e) => {
+      if (e.key === 'Control') disable();
+    };
+    map.scrollWheelZoom.disable();
+    container.addEventListener('keydown', onKeyDown);
+    container.addEventListener('keyup', onKeyUp);
+    // Also catch ctrl via window (map container may not have focus)
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keyup', onKeyUp);
+    return () => {
+      container.removeEventListener('keydown', onKeyDown);
+      container.removeEventListener('keyup', onKeyUp);
+      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('keyup', onKeyUp);
+      map.scrollWheelZoom.disable();
+    };
+  }, [map]);
+  return null;
+}
+
 function markerColor(h) {
   return h.user ? '#ffb057' : '#34c0eb';
 }
@@ -189,6 +220,7 @@ export default function HotspotMap() {
           onClick={handleMapClick}
         >
           <MapCapture onReady={(m) => (mapRef.current = m)} />
+          <CtrlScrollZoom />
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
             url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"

@@ -1,13 +1,15 @@
-// Vercel serverless function: fetches NOAA CO-OPS tide predictions
-// server-side (Vercel's egress reaches NOAA reliably) and returns clean
-// JSON to the browser. This avoids browser CORS + any edge-blocking of
-// client requests to api.tidesandcurrents.noaa.gov.
+// Vercel serverless function: fetches tide predictions.
 //
-// GET /api/tides  ->  { stations: [{ id, name, predictions:[{type,time,height}], error? }], fetchedAt }
+// Strategy (most-reliable first):
+//   1. NOAA CO-OPS (free, no key) — tried first in case it recovers.
+//   2. StormGlass (free dev tier) using STORMGLASS_KEY env — real extremes.
+//   3. If both fail, return a clear error per station (UI shows "unavailable").
+//
+// GET /api/tides -> { stations:[{id,name,lat,lng,predictions:[{type,time,height}],error?}], fetchedAt }
 
 const STATIONS = [
-  { id: '8775238', name: 'Aransas Pass' },
-  { id: '8779770', name: 'Packery Channel' },
+  { id: '8775238', name: 'Aransas Pass', lat: 27.835, lng: -97.055 },
+  { id: '8779770', name: 'Packery Channel', lat: 27.62, lng: -97.23 },
 ];
 
 function ymd(date) {
@@ -17,7 +19,12 @@ function ymd(date) {
   return `${y}${m}${d}`;
 }
 
-function buildUrl(stationId, begin, end) {
+function isoDay(date) {
+  return date.toISOString().split('T')[0];
+}
+
+// ---- NOAA (kept for when it recovers) ----
+function noaaUrl(stationId, begin, end) {
   const p = new URLSearchParams({
     begin_date: begin,
     end_date: end,
@@ -32,47 +39,66 @@ function buildUrl(stationId, begin, end) {
   return `https://api.tidesandcurrents.noaa.gov/api/prod/datagetson?${p.toString()}`;
 }
 
-export default async function handler(req, res) {
-  // CORS (in case it's ever called cross-origin)
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Content-Type', 'application/json');
-
+async function fetchNoaa(st) {
   const today = new Date();
   const start = new Date(today);
   start.setDate(today.getDate() - 1);
   const end = new Date(today);
   end.setDate(today.getDate() + 1);
-  const begin = ymd(start);
-  const finish = ymd(end);
+  const url = noaaUrl(st.id, ymd(start), ymd(end));
+  const r = await fetch(url, { headers: { Accept: 'application/json' } });
+  if (!r.ok) throw new Error(`NOAA HTTP ${r.status}`);
+  const data = await r.json();
+  if (data.error) throw new Error(data.error.message || 'NOAA error');
+  return (data.predictions || []).map((p) => ({
+    type: p.type,
+    time: p.t,
+    height: Number(p.v),
+  }));
+}
 
-  try {
-    const results = await Promise.all(
-      STATIONS.map(async (st) => {
-        const url = buildUrl(st.id, begin, finish);
+// ---- StormGlass (real extremes, keyed) ----
+async function fetchStormGlass(st, key) {
+  const start = isoDay(new Date());
+  const end = isoDay(new Date(Date.now() + 2 * 86400000));
+  const url = `https://api.stormglass.io/v2/tides/extremes/point?lat=${st.lat}&lng=${st.lng}&start=${start}&end=${end}`;
+  const r = await fetch(url, { headers: { Authorization: key } });
+  if (!r.ok) throw new Error(`StormGlass HTTP ${r.status}`);
+  const data = await r.json();
+  const extremes = data.data || [];
+  return extremes.map((e) => ({
+    type: e.type === 'high' ? 'H' : 'L',
+    time: e.time,
+    height: e.height != null ? Number(e.height) : null,
+  }));
+}
+
+export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Content-Type', 'application/json');
+
+  const key = process.env.STORMGLASS_KEY;
+  const results = await Promise.all(
+    STATIONS.map(async (st) => {
+      // 1) NOAA
+      try {
+        const predictions = await fetchNoaa(st);
+        if (predictions.length) return { ...st, predictions };
+      } catch (_) {
+        /* fall through */
+      }
+      // 2) StormGlass
+      if (key) {
         try {
-          const r = await fetch(url, {
-            headers: { Accept: 'application/json', 'User-Agent': 'GulfBite/1.0' },
-          });
-          if (!r.ok) {
-            return { id: st.id, name: st.name, predictions: [], error: `HTTP ${r.status}` };
-          }
-          const data = await r.json();
-          if (data.error) {
-            return { id: st.id, name: st.name, predictions: [], error: data.error.message || 'NOAA error' };
-          }
-          const predictions = (data.predictions || []).map((p) => ({
-            type: p.type,
-            time: p.t,
-            height: Number(p.v),
-          }));
-          return { id: st.id, name: st.name, predictions };
+          const predictions = await fetchStormGlass(st, key);
+          if (predictions.length) return { ...st, predictions, source: 'stormglass' };
         } catch (e) {
-          return { id: st.id, name: st.name, predictions: [], error: e.message };
+          return { ...st, predictions: [], error: `StormGlass: ${e.message}` };
         }
-      })
-    );
-    res.status(200).json({ stations: results, fetchedAt: new Date().toISOString() });
-  } catch (e) {
-    res.status(200).json({ stations: STATIONS.map((s) => ({ ...s, predictions: [], error: e.message })), fetchedAt: new Date().toISOString() });
-  }
+      }
+      return { ...st, predictions: [], error: key ? 'both sources failed' : 'NOAA down, no StormGlass key' };
+    })
+  );
+
+  res.status(200).json({ stations: results, fetchedAt: new Date().toISOString() });
 }
