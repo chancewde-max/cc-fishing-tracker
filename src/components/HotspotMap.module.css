@@ -108,6 +108,174 @@
   font-size: 0.82rem;
 }
 
+/* ---- Catch-logging popup ---- */
+.popupBody {
+  min-width: 210px;
+  max-width: 260px;
+  max-height: 320px;
+  overflow-y: auto;
+  font-family: var(--font-body);
+  color: var(--text);
+}
+
+.catchTitle {
+  margin: 0.5rem 0 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--teal-bright);
+  text-transform: uppercase;
+}
+
+.popupForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.formRow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+}
+
+.input,
+.select {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  padding: 0.3rem 0.4rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-deep);
+  color: var(--text);
+}
+
+.input:focus,
+.select:focus {
+  outline: 2px solid var(--teal-bright);
+  outline-offset: 0;
+}
+
+.submitBtn {
+  margin-top: 0.15rem;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.78rem;
+  border-radius: 999px;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--amber);
+  background: var(--amber);
+  color: var(--bg-deep);
+  cursor: pointer;
+}
+
+.submitBtn:hover {
+  background: var(--amber-bright);
+}
+
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.catchList {
+  list-style: none;
+  margin: 0.25rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.catchItem {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.4rem;
+  font-size: 0.76rem;
+  padding: 0.3rem 0.4rem;
+  border-radius: var(--radius-sm);
+  background: rgba(52, 192, 235, 0.08);
+  border: 1px solid var(--border-soft);
+}
+
+.catchSpecies {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.catchMeta {
+  color: var(--text-dim);
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
+
+.catchNote {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  margin-top: 0.1rem;
+}
+
+.delCatch {
+  background: none;
+  border: none;
+  color: var(--amber);
+  font-size: 0.7rem;
+  cursor: pointer;
+  padding: 0;
+}
+
+.emptyCatch {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  font-style: italic;
+  margin: 0.2rem 0 0;
+}
+
+.removeBtn {
+  margin-top: 0.4rem;
+  background: none;
+  border: 1px solid var(--border-strong);
+  color: var(--amber);
+  font-size: 0.72rem;
+  border-radius: var(--radius-sm);
+  padding: 0.2rem 0.45rem;
+  cursor: pointer;
+}
+
+.signInNote {
+  font-size: 0.74rem;
+  color: var(--amber-bright);
+  background: rgba(255, 176, 87, 0.12);
+  border: 1px dashed rgba(255, 176, 87, 0.4);
+  border-radius: var(--radius-sm);
+  padding: 0.35rem 0.45rem;
+  margin: 0.4rem 0 0;
+}
+
+/* ---- Add-hotspot inline form ---- */
+.addForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  background: rgba(255, 176, 87, 0.08);
+  border: 1px dashed rgba(255, 176, 87, 0.4);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.6rem;
+}
+
+.addForm label {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
 @media (max-width: 960px) {
   .map {
     height: 60vh;

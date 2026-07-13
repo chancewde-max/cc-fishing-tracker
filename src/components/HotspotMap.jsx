@@ -1,74 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import styles from './HotspotMap.module.css';
+import { useHotspots, DEFAULT_HOTSPOTS, isAuthError } from '../lib/useHotspots';
+import { useCatches } from '../lib/useCatches';
 
 const CENTER = [27.69, -97.36];
 const ZOOM = 11;
-const STORAGE_KEY = 'gulfbite.hotspots.v1';
-
-// Real Corpus Christi inshore hotspots (approx lat/lng).
-const DEFAULT_HOTSPOTS = [
-  {
-    id: 'aransas-pass',
-    name: 'Aransas Pass',
-    note: 'Jetties & channel mouth — trout, redfish on the outgoing.',
-    lat: 27.8338,
-    lng: -97.0556,
-    user: false,
-  },
-  {
-    id: 'packery-channel',
-    name: 'Packery Channel',
-    note: 'Inlet between CC Beach & Padre — strong current, drum & reds.',
-    lat: 27.6389,
-    lng: -97.2356,
-    user: false,
-  },
-  {
-    id: 'cc-bay-causeway',
-    name: 'CC Bay Causeway',
-    note: 'Pillings & lights — classic trout drift near the causeway.',
-    lat: 27.7417,
-    lng: -97.2497,
-    user: false,
-  },
-  {
-    id: 'redfish-bay',
-    name: 'Redfish Bay',
-    note: 'Grass flats north of the causeway — topwater redfish country.',
-    lat: 27.85,
-    lng: -97.27,
-    user: false,
-  },
-  {
-    id: 'estes-flats',
-    name: 'Estes Flats',
-    note: 'Shallow turtle-grass flats — sight-cast reds on calm days.',
-    lat: 27.62,
-    lng: -97.2,
-    user: false,
-  },
-  {
-    id: 'bird-island-basin',
-    name: 'Bird Island Basin',
-    note: 'Sheltered fishing pier inside the ship channel — drum & trout.',
-    lat: 27.8197,
-    lng: -97.0575,
-    user: false,
-  },
-];
-
-function loadCustom() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
 
 // Captures the Leaflet map instance + keeps the canvas sized correctly.
 function MapCapture({ onReady }) {
@@ -116,73 +54,245 @@ function markerColor(h) {
   return h.user ? '#ffb057' : '#34c0eb';
 }
 
-export default function HotspotMap() {
-  const [custom, setCustom] = useState(loadCustom);
-  const [placing, setPlacing] = useState(false);
-  const mapRef = useRef(null);
+// Convert a Date to a value usable by <input type="datetime-local"> (local time).
+function toLocalInputValue(d) {
+  const off = d.getTimezoneOffset();
+  const local = new Date(d.getTime() - off * 60000);
+  return local.toISOString().slice(0, 16);
+}
 
-  const hotspots = useMemo(
-    () => [...DEFAULT_HOTSPOTS, ...custom],
-    [custom]
-  );
+function fmtCaughtAt(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  return d.toLocaleString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+}
 
-  const persist = (next) => {
-    setCustom(next);
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-    } catch {
-      /* ignore quota errors */
-    }
-  };
+// ---- Catch-logging section inside each hotspot popup ----
+function CatchSection({ hotspot }) {
+  const { catches, loading, error, isAuthError, addCatch, removeCatch } =
+    useCatches(hotspot.id);
 
-  const addAt = (latlng, fromCenter = false) => {
-    const name = window.prompt(
-      fromCenter ? 'Name this hotspot:' : 'Name this hotspot:'
-    );
-    if (!name) {
-      if (!fromCenter) setPlacing(false);
+  const [species, setSpecies] = useState('Speckled Trout');
+  const [caughtAt, setCaughtAt] = useState(() => toLocalInputValue(new Date()));
+  const [lengthIn, setLengthIn] = useState('');
+  const [note, setNote] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [localErr, setLocalErr] = useState(null);
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setBusy(true);
+    setLocalErr(null);
+    // datetime-local value -> ensure 'Z' is dropped; send as timestamptz string
+    const caughtIso = caughtAt ? new Date(caughtAt).toISOString() : new Date().toISOString();
+    const res = await addCatch({
+      hotspot_id: hotspot.id,
+      species,
+      caught_at: caughtIso,
+      length_in: lengthIn === '' ? null : Number(lengthIn),
+      note: note.trim(),
+    });
+    setBusy(false);
+    if (res && res.error) {
+      setLocalErr(res.error);
       return;
     }
-    const note =
-      window.prompt(`Note for "${name}" (optional):`, '') || 'User-added spot.';
-    const spot = {
-      id: `user-${Date.now()}`,
-      name: name.trim(),
-      note,
-      lat: latlng.lat,
-      lng: latlng.lng,
-      user: true,
-    };
-    persist([...custom, spot]);
-    setPlacing(false);
+    setLengthIn('');
+    setNote('');
   };
+
+  return (
+    <div className={styles.popupBody}>
+      <p className={styles.catchTitle}>Log a catch</p>
+      <form className={styles.popupForm} onSubmit={submit}>
+        <label className={styles.formRow}>
+          Species
+          <select
+            className={styles.select}
+            value={species}
+            onChange={(e) => setSpecies(e.target.value)}
+          >
+            <option>Speckled Trout</option>
+            <option>Redfish</option>
+            <option>Black Drum</option>
+            <option>Other</option>
+          </select>
+        </label>
+        <label className={styles.formRow}>
+          Date / Time
+          <input
+            className={styles.input}
+            type="datetime-local"
+            value={caughtAt}
+            onChange={(e) => setCaughtAt(e.target.value)}
+          />
+        </label>
+        <label className={styles.formRow}>
+          Length (inches)
+          <input
+            className={styles.input}
+            type="number"
+            min="0"
+            step="0.1"
+            value={lengthIn}
+            onChange={(e) => setLengthIn(e.target.value)}
+            placeholder="e.g. 22"
+          />
+        </label>
+        <label className={styles.formRow}>
+          Note (optional)
+          <input
+            className={styles.input}
+            type="text"
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder="lure, conditions…"
+          />
+        </label>
+        <button type="submit" className={styles.submitBtn} disabled={busy}>
+          {busy ? 'Saving…' : 'Save catch'}
+        </button>
+      </form>
+
+      {isAuthError && (
+        <p className={styles.signInNote} role="status">
+          Sign in to save catches.
+        </p>
+      )}
+      {localErr && !isAuthError && (
+        <p className={styles.signInNote} role="status">
+          Couldn't save: {localErr.message || 'try again'}
+        </p>
+      )}
+
+      <p className={styles.catchTitle}>Recent catches</p>
+      {loading ? (
+        <p className={styles.emptyCatch}>Loading…</p>
+      ) : catches.length === 0 ? (
+        <p className={styles.emptyCatch}>No catches logged yet.</p>
+      ) : (
+        <ul className={styles.catchList}>
+          {catches.map((c) => (
+            <li key={c.id} className={styles.catchItem}>
+              <span>
+                <span className={styles.catchSpecies}>{c.species}</span>
+                {c.length_in != null && ` · ${c.length_in}″`}
+                {c.note && <span className={styles.catchNote}>{c.note}</span>}
+              </span>
+              <span className={styles.catchMeta}>
+                {fmtCaughtAt(c.caught_at)}
+                <br />
+                <button
+                  type="button"
+                  className={styles.delCatch}
+                  onClick={() => removeCatch(c.id)}
+                >
+                  remove
+                </button>
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+// ---- Per-hotspot popup content ----
+function HotspotPopup({ hotspot, onRemove }) {
+  return (
+    <div>
+      <strong>{hotspot.name}</strong>
+      {hotspot.user && <span className={styles.userTag}> · you</span>}
+      <br />
+      <span className={styles.popupNote}>{hotspot.note}</span>
+      <CatchSection hotspot={hotspot} />
+      {hotspot.user && (
+        <button
+          type="button"
+          className={styles.removeBtn}
+          onClick={() => onRemove(hotspot.id)}
+        >
+          Remove this hotspot
+        </button>
+      )}
+    </div>
+  );
+}
+
+export default function HotspotMap() {
+  const { hotspots, loading, error, addHotspot, removeHotspot } = useHotspots();
+  const [placing, setPlacing] = useState(false);
+  const [pending, setPending] = useState(null); // { lat, lng } awaiting name/note
+  const [addName, setAddName] = useState('');
+  const [addNote, setAddNote] = useState('');
+  const [addErr, setAddErr] = useState(null);
+  const mapRef = useRef(null);
 
   const handleMapClick = (e) => {
     if (!placing) return;
-    addAt(e.latlng);
+    setPending({ lat: e.latlng.lat, lng: e.latlng.lng });
   };
 
   const handleAddButton = () => {
     if (placing) {
       setPlacing(false);
+      setPending(null);
+      setAddErr(null);
       return;
     }
     setPlacing(true);
+    setAddName('');
+    setAddNote('');
   };
 
   const handleAddAtCenter = () => {
     const c = mapRef.current
       ? mapRef.current.getCenter()
       : L.latLng(CENTER[0], CENTER[1]);
-    addAt({ lat: c.lat, lng: c.lng }, true);
+    setPending({ lat: c.lat, lng: c.lng });
   };
+
+  const submitAdd = async (e) => {
+    e.preventDefault();
+    if (!pending || !addName.trim()) return;
+    setAddErr(null);
+    const res = await addHotspot({
+      name: addName.trim(),
+      note: addNote.trim() || 'User-added spot.',
+      lat: pending.lat,
+      lng: pending.lng,
+    });
+    if (res && res.error) {
+      setAddErr(res.error);
+      return;
+    }
+    setPending(null);
+    setPlacing(false);
+    setAddName('');
+    setAddNote('');
+  };
+
+  const handleRemove = async (id) => {
+    await removeHotspot(id);
+  };
+
+  const dbCount = hotspots.filter((h) => h.user).length;
 
   return (
     <section className={styles.wrap} aria-label="Fishing hotspots map">
       <div className={styles.header}>
         <div>
           <h3>Hotspots</h3>
-          <span className={styles.sub}>Corpus Christi Bay &amp; Lighthouse Lakes</span>
+          <span className={styles.sub}>
+            Corpus Christi Bay &amp; Lighthouse Lakes
+          </span>
         </div>
         <div className={styles.actions}>
           {placing && (
@@ -208,6 +318,48 @@ export default function HotspotMap() {
       {placing && (
         <p className={styles.hint} role="status">
           Click the map to drop your pin, or use “Drop at center”.
+        </p>
+      )}
+
+      {pending && (
+        <form className={styles.addForm} onSubmit={submitAdd}>
+          <label>
+            Name
+            <input
+              className={styles.input}
+              type="text"
+              value={addName}
+              autoFocus
+              onChange={(e) => setAddName(e.target.value)}
+              placeholder="e.g. Secret Flat"
+            />
+          </label>
+          <label>
+            Note (optional)
+            <input
+              className={styles.input}
+              type="text"
+              value={addNote}
+              onChange={(e) => setAddNote(e.target.value)}
+              placeholder="what's there…"
+            />
+          </label>
+          <button type="submit" className={styles.submitBtn} disabled={!addName.trim()}>
+            Save hotspot
+          </button>
+          {addErr && (
+            <p className={styles.signInNote} role="status">
+              {isAuthError(addErr)
+                ? 'Sign in to save hotspots.'
+                : `Couldn't save: ${addErr.message || 'try again'}`}
+            </p>
+          )}
+        </form>
+      )}
+
+      {error && (
+        <p className={styles.signInNote} role="status">
+          Couldn't load saved spots — showing built-ins only.
         </p>
       )}
 
@@ -238,15 +390,12 @@ export default function HotspotMap() {
               }}
               eventHandlers={{
                 click: () => {
-                  if (placing) addAt({ lat: h.lat, lng: h.lng });
+                  if (placing) handleMapClick({ latlng: { lat: h.lat, lng: h.lng } });
                 },
               }}
             >
               <Popup>
-                <strong>{h.name}</strong>
-                {h.user && <span className={styles.userTag}> · you</span>}
-                <br />
-                <span className={styles.popupNote}>{h.note}</span>
+                <HotspotPopup hotspot={h} onRemove={handleRemove} />
               </Popup>
             </CircleMarker>
           ))}
@@ -254,8 +403,10 @@ export default function HotspotMap() {
       </div>
 
       <p className={styles.count}>
-        {DEFAULT_HOTSPOTS.length} built-in · {custom.length} saved locally
+        {DEFAULT_HOTSPOTS.length} built-in · {dbCount} saved
+        {loading ? ' (loading…)' : ''}
       </p>
     </section>
   );
 }
+

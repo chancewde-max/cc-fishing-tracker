@@ -58,10 +58,12 @@ async function fetchNoaa(st) {
 }
 
 // ---- StormGlass (real extremes, keyed) ----
+// Correct v2 path is /v2/tide/extremes/point (singular "tide").
+// Heights come back in METERS; convert to FEET for the US display.
 async function fetchStormGlass(st, key) {
   const start = isoDay(new Date());
   const end = isoDay(new Date(Date.now() + 2 * 86400000));
-  const url = `https://api.stormglass.io/v2/tides/extremes/point?lat=${st.lat}&lng=${st.lng}&start=${start}&end=${end}`;
+  const url = `https://api.stormglass.io/v2/tide/extremes/point?lat=${st.lat}&lng=${st.lng}&start=${start}&end=${end}`;
   const r = await fetch(url, { headers: { Authorization: key } });
   if (!r.ok) throw new Error(`StormGlass HTTP ${r.status}`);
   const data = await r.json();
@@ -69,7 +71,7 @@ async function fetchStormGlass(st, key) {
   return extremes.map((e) => ({
     type: e.type === 'high' ? 'H' : 'L',
     time: e.time,
-    height: e.height != null ? Number(e.height) : null,
+    height: e.height != null ? Number((e.height * 3.28084).toFixed(1)) : null,
   }));
 }
 
@@ -77,7 +79,7 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Content-Type', 'application/json');
 
-  const key = process.env.STORMGLASS_KEY;
+  const key = process.env.STORMGLASS_KEY || 'ac37c5f8-7ed7-11f1-8cc9-0242ac120004-ac37c666-7ed7-11f1-8cc9-0242ac120004';
   const results = await Promise.all(
     STATIONS.map(async (st) => {
       // 1) NOAA
