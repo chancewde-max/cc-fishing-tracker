@@ -16,18 +16,21 @@
   pointer-events: none;
 }
 
-/* Calm, mostly-static gradient in the app's own palette — no repeating
-   tiled patterns or fast motion, just a hint of sky-to-deep-water depth. */
+/* The collage photo, heavily blurred + darkened ahead of time (see
+   src/assets/bay-collage-bg.jpg) so it reads as color/texture, not
+   competing detail — a dark scrim on top keeps foreground text legible. */
 .sky {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    180deg,
-    #3a5a70 0%,
-    #1c3c50 40%,
-    var(--bg-panel-2) 65%,
-    var(--bg-deep) 100%
-  );
+  background-image: linear-gradient(
+      180deg,
+      rgba(7, 21, 29, 0.55) 0%,
+      rgba(7, 21, 29, 0.7) 45%,
+      rgba(7, 21, 29, 0.88) 100%
+    ),
+    url('../assets/bay-collage-bg.jpg');
+  background-size: cover;
+  background-position: center;
 }
 
 .water {
@@ -36,7 +39,7 @@
   right: 0;
   bottom: 0;
   height: 38%;
-  background: linear-gradient(180deg, rgba(10, 45, 65, 0.6), var(--bg-deep));
+  background: linear-gradient(180deg, rgba(10, 30, 42, 0.35), var(--bg-deep));
 }
 
 /* One very slow, low-contrast highlight drifting across the water —
