@@ -1,0 +1,118 @@
+.card {
+  background: linear-gradient(160deg, var(--bg-panel), var(--bg-panel-2));
+  border: 1px solid var(--border-soft);
+  border-left: 4px solid var(--border-strong);
+  border-radius: var(--radius);
+  padding: var(--space-md) var(--space-md) var(--space-sm);
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+.excellent {
+  border-left-color: var(--good);
+}
+.good {
+  border-left-color: var(--teal-bright);
+}
+.fair {
+  border-left-color: var(--fair);
+}
+.poor {
+  border-left-color: var(--poor);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.emoji {
+  font-size: 1.4rem;
+}
+
+.name {
+  flex: 1;
+  margin: 0;
+  font-size: 1.2rem;
+  letter-spacing: 0.01em;
+}
+
+.label {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-muted);
+}
+
+.label.excellent {
+  color: #06281c;
+  background: var(--good);
+}
+.label.good {
+  color: #04222e;
+  background: var(--teal-bright);
+}
+.label.fair {
+  color: #2a2003;
+  background: var(--fair);
+}
+.label.poor {
+  color: #2a0707;
+  background: var(--poor);
+}
+
+.gauge {
+  display: flex;
+  gap: 6px;
+  margin: 0.7rem 0 0.6rem;
+}
+
+.pip {
+  flex: 1;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.pipOn {
+  background: linear-gradient(90deg, var(--amber-deep), var(--amber-bright));
+  box-shadow: 0 0 8px rgba(255, 176, 87, 0.4);
+}
+
+.pipOff {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.reasons {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.reasons li {
+  position: relative;
+  padding-left: 1.2rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
+.reasons li::before {
+  content: '▸';
+  position: absolute;
+  left: 0;
+  color: var(--amber);
+}

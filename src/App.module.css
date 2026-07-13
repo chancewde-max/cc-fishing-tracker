@@ -1,0 +1,53 @@
+.appShell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(255, 176, 87, 0.08), transparent 60%),
+    radial-gradient(900px 500px at 0% 0%, rgba(22, 138, 173, 0.14), transparent 55%),
+    var(--bg-deep);
+  color: var(--text-primary);
+}
+
+.main {
+  flex: 1;
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--space-lg) var(--space-md);
+  box-sizing: border-box;
+}
+
+/* Dashboard + map sit side by side on wide screens, stack on mobile */
+.homeGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: var(--space-lg);
+  align-items: start;
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-md) var(--space-lg);
+  border-top: 1px solid var(--border-soft);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.footerMuted {
+  color: var(--text-dim);
+}
+
+@media (max-width: 960px) {
+  .homeGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.hotspotPage {
+  display: block;
+}

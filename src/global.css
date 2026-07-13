@@ -1,0 +1,153 @@
+/* ============================================================
+   Gulf Bite — global theme tokens & base styles
+   sunset-on-water: deep marine navy/teal + warm amber accent
+   ============================================================ */
+
+:root {
+  /* Base palette */
+  --bg-deep: #07151d;
+  --bg-panel: #0d2230;
+  --bg-panel-2: #102b3a;
+  --bg-elev: #14344652;
+
+  /* Brand accents */
+  --teal: #168aad;
+  --teal-bright: #34c0eb;
+  --amber: #ffb057;
+  --amber-bright: #ffc879;
+  --amber-deep: #e8923a;
+
+  /* Status */
+  --good: #4cc38a;
+  --fair: #ffc857;
+  --poor: #ff6b5e;
+
+  /* Text */
+  --text-primary: #eaf4f7;
+  --text-muted: #9fb8c4;
+  --text-dim: #6f8893;
+
+  /* Lines */
+  --border-soft: #1d3b4d;
+  --border-strong: #2a5167;
+
+  /* Type */
+  --font-display: 'Rokkitt', 'Georgia', serif;
+  --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* Spacing */
+  --space-xs: 0.35rem;
+  --space-sm: 0.6rem;
+  --space-md: 1rem;
+  --space-lg: 1.6rem;
+  --space-xl: 2.4rem;
+
+  --radius: 14px;
+  --radius-sm: 9px;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --shadow-soft: 0 4px 16px rgba(0, 0, 0, 0.25);
+
+  --max-width: 1280px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.1;
+  margin: 0 0 0.4em;
+}
+
+a {
+  color: var(--teal-bright);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--amber);
+}
+
+/* Accessibility: visible focus ring for keyboard users */
+:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+button {
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+
+/* Generic card primitive reused across components */
+.card {
+  background: linear-gradient(160deg, var(--bg-panel), var(--bg-panel-2));
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+  padding: var(--space-lg);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Leaflet popup theming to match the dashboard */
+.leaflet-popup-content-wrapper {
+  background: var(--bg-panel-2);
+  color: var(--text-primary);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+}
+
+.leaflet-popup-tip {
+  background: var(--bg-panel-2);
+  border: 1px solid var(--border-strong);
+}
+
+.leaflet-popup-content {
+  margin: 12px 14px;
+  font-family: var(--font-body);
+}
+
+.leaflet-container a.leaflet-popup-close-button {
+  color: var(--text-muted);
+}

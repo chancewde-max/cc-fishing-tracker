@@ -1,0 +1,150 @@
+.wrap {
+  background: linear-gradient(160deg, var(--bg-panel), var(--bg-panel-2));
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  padding: var(--space-md);
+  box-shadow: var(--shadow-soft);
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 0.7rem;
+}
+
+.header h3 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.sub {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+.station {
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.stationName {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 0 0 0.4rem;
+  font-size: 0.95rem;
+  font-family: var(--font-body);
+  font-weight: 700;
+}
+
+.stationId {
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  font-weight: 500;
+}
+
+.svg {
+  width: 100%;
+  height: 120px;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.area {
+  fill: rgba(52, 192, 235, 0.12);
+}
+
+.line {
+  fill: none;
+  stroke: var(--teal-bright);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.dotHi {
+  fill: var(--amber);
+}
+.dotLo {
+  fill: var(--teal);
+}
+
+.nowLine {
+  stroke: rgba(255, 255, 255, 0.35);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  vector-effect: non-scaling-stroke;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+}
+
+.hi,
+.lo {
+  font-weight: 700;
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+  padding: 0.1rem 0.3rem;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.hi {
+  color: var(--amber);
+  background: rgba(255, 176, 87, 0.14);
+}
+
+.lo {
+  color: var(--teal-bright);
+  background: rgba(52, 192, 235, 0.14);
+}
+
+.time {
+  color: var(--text-primary);
+}
+
+.day {
+  color: var(--text-dim);
+  font-style: normal;
+  font-size: 0.68rem;
+  margin-left: 0.2rem;
+}
+
+.height {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.empty {
+  color: var(--text-dim);
+  font-size: 0.82rem;
+}
+
+@media (max-width: 520px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
