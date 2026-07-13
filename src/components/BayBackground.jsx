@@ -1,14 +1,12 @@
 import styles from './BayBackground.module.css';
 
-// A slowly-scrolling Corpus Christi bay scene: sky, two parallax water bands,
-// and a few small boats drifting across at different speeds. Pure CSS/SVG,
-// no network assets — used behind the landing/sign-in/sign-up pages.
-// The backdrop is fixed to one viewport (not the scrollable page height), so
-// it stays a stable sky-to-water scene no matter how tall the page content is.
+// A calm, mostly-static Corpus Christi bay backdrop: sky, water, a subtle
+// slow shimmer, and a couple of small boats drifting across very slowly.
+// Pure CSS/SVG, no network assets — used behind the landing/sign-in/sign-up
+// pages. Fixed to one viewport so it stays stable regardless of page height.
 const BOATS = [
-  { emoji: '⛵', top: '58%', duration: '38s', delay: '0s', size: '2.1rem' },
-  { emoji: '🚤', top: '71%', duration: '26s', delay: '-9s', size: '1.6rem' },
-  { emoji: '⛴️', top: '65%', duration: '46s', delay: '-20s', size: '2.4rem' },
+  { emoji: '⛵', top: '62%', duration: '85s', delay: '0s', size: '1.8rem' },
+  { emoji: '🚤', top: '78%', duration: '70s', delay: '-35s', size: '1.3rem' },
 ];
 
 export default function BayBackground({ children }) {
@@ -16,8 +14,8 @@ export default function BayBackground({ children }) {
     <div className={styles.scene}>
       <div className={styles.backdrop} aria-hidden="true">
         <div className={styles.sky} />
-        <div className={styles.waterFar} />
-        <div className={styles.waterNear} />
+        <div className={styles.water} />
+        <div className={styles.shimmer} />
         {BOATS.map((b, i) => (
           <span
             key={i}

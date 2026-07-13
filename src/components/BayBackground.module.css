@@ -16,69 +16,56 @@
   pointer-events: none;
 }
 
+/* Calm, mostly-static gradient in the app's own palette — no repeating
+   tiled patterns or fast motion, just a hint of sky-to-deep-water depth. */
 .sky {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     180deg,
-    #ffd8a8 0%,
-    #ffb877 18%,
-    #6fb3d2 46%,
-    #1c7fa3 62%,
-    #0d4f6b 100%
+    #3a5a70 0%,
+    #1c3c50 40%,
+    var(--bg-panel-2) 65%,
+    var(--bg-deep) 100%
   );
 }
 
-/* Two tiled wave layers scrolling at different speeds for a parallax feel. */
-.waterFar,
-.waterNear {
+.water {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
-  height: 42%;
-  background-repeat: repeat-x;
-  background-size: 220px 100%;
-  will-change: background-position;
+  height: 38%;
+  background: linear-gradient(180deg, rgba(10, 45, 65, 0.6), var(--bg-deep));
 }
 
-.waterFar {
-  bottom: 6%;
-  height: 20%;
-  opacity: 0.55;
-  background-image: radial-gradient(ellipse at 50% 120%, rgba(255, 255, 255, 0.35) 0%, transparent 60%),
-    linear-gradient(180deg, rgba(20, 90, 120, 0.5), rgba(10, 60, 85, 0.85));
-  animation: driftFar 60s linear infinite;
+/* One very slow, low-contrast highlight drifting across the water —
+   barely perceptible, not a repeating/strobing pattern. */
+.shimmer {
+  position: absolute;
+  left: -20%;
+  right: -20%;
+  bottom: 4%;
+  height: 18%;
+  background: radial-gradient(ellipse 40% 100% at 50% 50%, rgba(255, 255, 255, 0.06), transparent 70%);
+  animation: shimmerDrift 90s ease-in-out infinite;
 }
 
-.waterNear {
-  background-image: radial-gradient(ellipse at 30% 0%, rgba(255, 255, 255, 0.25) 0%, transparent 55%),
-    linear-gradient(180deg, #0d4f6b, #062d3f);
-  animation: driftNear 34s linear infinite;
-}
-
-@keyframes driftFar {
-  from {
-    background-position-x: 0;
+@keyframes shimmerDrift {
+  0%,
+  100% {
+    transform: translateX(-15%);
   }
-  to {
-    background-position-x: -220px;
-  }
-}
-
-@keyframes driftNear {
-  from {
-    background-position-x: 0;
-  }
-  to {
-    background-position-x: 220px;
+  50% {
+    transform: translateX(15%);
   }
 }
 
 .boat {
   position: absolute;
   left: -10vw;
-  filter: drop-shadow(0 6px 6px rgba(0, 0, 0, 0.35));
+  opacity: 0.9;
+  filter: drop-shadow(0 4px 5px rgba(0, 0, 0, 0.3));
   animation-name: sail;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
