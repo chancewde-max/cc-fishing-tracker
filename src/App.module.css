@@ -5,8 +5,7 @@
   overflow: hidden;
   background:
     radial-gradient(1200px 600px at 80% -10%, rgba(255, 176, 87, 0.08), transparent 60%),
-    radial-gradient(900px 500px at 0% 0%, rgba(22, 138, 173, 0.14), transparent 55%),
-    var(--bg-deep);
+    radial-gradient(900px 500px at 0% 0%, rgba(22, 138, 173, 0.14), transparent 55%);
   color: var(--text-primary);
 }
 
@@ -63,6 +62,12 @@
   }
 }
 
+/* display:block alone left this with an intrinsic (auto) height, so
+   HotspotMap's internal `height: 100%` chain had nothing to resolve
+   against and collapsed the map to 0px. Needs an actual definite height
+   to hand down, same as .homeGrid gets from .main. */
 .hotspotPage {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
