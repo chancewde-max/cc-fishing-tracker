@@ -33,13 +33,15 @@
   background-position: center;
 }
 
+/* A gentle extra darkening toward the very bottom (footer sits there) —
+   stays well short of opaque so the image keeps showing through. */
 .water {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
   height: 38%;
-  background: linear-gradient(180deg, rgba(10, 30, 42, 0.35), var(--bg-deep));
+  background: linear-gradient(180deg, transparent, rgba(7, 21, 29, 0.35));
 }
 
 /* One very slow, low-contrast highlight drifting across the water —
